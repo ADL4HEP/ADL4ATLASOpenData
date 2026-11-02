@@ -70,6 +70,9 @@ sha256sum -c /path/to/ADL4ATLASOpenData/docs/download/TTbarAnalysis.sha256
 # macOS: shasum -a 256 -c /path/to/ADL4ATLASOpenData/docs/download/TTbarAnalysis.sha256
 ```
 
+The checksums were computed on lxplus in November 2026 from the files in
+`/eos/opendata/atlas/OutreachDatasets/2020-01-22/` 
+
 ## Running from the local copy
 
 ```bash

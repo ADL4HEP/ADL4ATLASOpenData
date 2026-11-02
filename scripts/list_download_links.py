@@ -5,6 +5,9 @@
   docs/download/all.txt         all files of all analyses, without duplicates
   docs/download.md              instructions and per-analysis sizes
 
+The SHA-256 checksum files docs/download/*.sha256 are not written by this script: they were
+computed once on lxplus from /eos/opendata/atlas/OutreachDatasets/2020-01-22/.
+
 Sizes are obtained with HTTP HEAD requests (nothing is downloaded); use
 --no-sizes to skip them when offline.
 """
@@ -72,6 +75,24 @@ while read -r url; do
   curl -fL --retry 5 -C - -o "$rel" "$url"
 done < /path/to/ADL4ATLASOpenData/docs/download/TTbarAnalysis.txt
 ```
+
+## Checking the downloaded files
+
+Next to every list, `docs/download/<analysis>.sha256` (and `all.sha256`) holds the
+SHA-256 checksums of its files, with paths relative to the download directory.
+Run the check from that directory; every file should print `OK`:
+
+```bash
+cd ~/atlas-opendata
+sha256sum -c /path/to/ADL4ATLASOpenData/docs/download/TTbarAnalysis.sha256
+# macOS: shasum -a 256 -c /path/to/ADL4ATLASOpenData/docs/download/TTbarAnalysis.sha256
+```
+
+The checksums were computed on lxplus in November 2026 from the files in
+`/eos/opendata/atlas/OutreachDatasets/2020-01-22/`, the copies used for the reference
+results. The CERN Open Data portal records of the 2020 release point to the copies in
+`OutreachDatasets/2020-08-19/`, which are not identical byte by byte and do not pass this
+check: download from the lists above. Streamed input is not checked.
 
 ## Running from the local copy
 

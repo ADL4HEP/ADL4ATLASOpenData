@@ -37,8 +37,8 @@ ATLAS Open Data releases and is **not** the reference for this suite.
 In total, the nine analyses read 311 files (112.5 GB). The files do not have to
 be downloaded: CutLang streams them over XRootD from `eospublic.cern.ch`. With a
 slow connection, download them once and run from disk with `--input-dir`; see
-[`docs/download.md`](docs/download.md) for per-analysis download lists and
-commands. The complete list of files, cross-sections and sums of weights is in
+[`docs/download.md`](docs/download.md) for per-analysis download lists,
+commands and SHA-256 checksums to check the downloaded files. The complete list of files, cross-sections and sums of weights is in
 [`docs/samples.md`](docs/samples.md).
 
 ## Requirements
@@ -48,7 +48,7 @@ commands. The complete list of files, cross-sections and sums of weights is in
 | CutLang | v2.16.0 (`1f880fc`) | needs ROOT, flex and bison to build |
 | ROOT | 6.36.12 | with PyROOT and XRootD (for streaming the samples) |
 | Python | 3.9 or newer | packages: `pyyaml`, `numpy`, `uproot` |
-| OS | Linux or macOS | tested on macOS 26 (arm64) |
+| OS | Linux or macOS | tested on Linux RHEL9 and macOS 26 (arm64) |
 
 Streaming the samples needs ROOT built with XRootD (`root-config --has-xrootd` should
 print `yes`). The configs stream from
@@ -172,6 +172,19 @@ histogram by histogram, and cutflows bin by bin by label.
 - Splitting a sample into several CutLang processes (`--cutlang-parallel`) gives
   identical outputs to a single process.
 
+## Performance benchmark
+
+`benchmark/bench_Zee.C` replaces `run.sh` and `main_ZBosonAnalysis.C` of the Open Data
+framework's Z boson analysis and processes only the Z → ee sample. Copy it into
+`Analysis/ZBosonAnalysis/` of the framework at tag `10fb-legacy` and run it from there:
+
+```bash
+root -l -b -q 'bench_Zee.C("<path>/mc_361106.Zee.2lep.root", N)'
+```
+
+N = 1 runs sequentially; N > 1 uses N PROOF-Lite workers. An optional third argument sets
+the PROOF-Lite sandbox directory, and a fourth limits the number of events.
+
 ## Configuration files
 
 `config/samples/<analysis>.yaml`:
@@ -192,7 +205,7 @@ groups:                                            # merged output files <group>
   ttbar: [ttbar_lep]
 ```
 
-`docs/samples.md` lists all samples in readable form (`python3 scripts/list_samples.py` regenerates it).
+`docs/samples.md` lists all samples in readable form.
 
 ## Repository layout
 
@@ -202,10 +215,9 @@ config/samples/<A>.yaml     input files, cross-sections, sums of weights, merge 
 scripts/run_analysis.py     run CutLang over the samples of an analysis
 scripts/normalize_merge.py  normalise MC by 1/(sumw*eff) and merge into groups
 scripts/compare_outputs.py  bin-by-bin comparison of two CutLang output files
-scripts/list_samples.py     regenerate docs/samples.md
-scripts/list_download_links.py  regenerate docs/download.md and docs/download/*.txt
-scripts/plot_all.py         plots of the merged outputs, as in the article
-docs/                       samples.md, download.md (+ download/<A>.txt URL lists)
+scripts/plot_all.py         plotting the merged outputs
+docs/                       samples.md, download.md (+ download/<A>.txt URL lists, <A>.sha256 checksums)
+benchmark/bench_Zee.C       Running the Open Data framework for performance benchmark (Z boson analysis, Z→ee only)
 ```
 
 ## Citing
