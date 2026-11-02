@@ -58,6 +58,18 @@ while read -r url; do
 done < /path/to/ADL4ATLASOpenData/docs/download/TTbarAnalysis.txt
 ```
 
+## Checking the downloaded files
+
+Next to every list, `docs/download/<analysis>.sha256` (and `all.sha256`) holds the
+SHA-256 checksums of its files, with paths relative to the download directory.
+Run the check from that directory; every file should print `OK`:
+
+```bash
+cd ~/atlas-opendata
+sha256sum -c /path/to/ADL4ATLASOpenData/docs/download/TTbarAnalysis.sha256
+# macOS: shasum -a 256 -c /path/to/ADL4ATLASOpenData/docs/download/TTbarAnalysis.sha256
+```
+
 ## Running from the local copy
 
 ```bash
