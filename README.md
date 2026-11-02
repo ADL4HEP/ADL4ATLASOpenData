@@ -62,7 +62,7 @@ download the files (`docs/download.md`).
 ## Installation
 
 ```bash
-# 1. CutLang at the release used for the article
+# 1. Bulding CutLang v2.16.0
 git clone https://github.com/unelg/CutLang.git
 cd CutLang && git checkout v2.16.0
 cd CLA && make -j4 && cd ../..        # requires ROOT (root-config in PATH), flex, bison
@@ -224,7 +224,7 @@ benchmark/bench_Zee.C       Running the Open Data framework for performance benc
 
 If you use this suite, please cite the article [TBD: reference] and the
 release used ([TBD: Zenodo DOI]). The ADL files build on the
-[ADL4LHCOpenData](https://github.com/ADL4HEP/ADL4LHCOpenData) collection.
+[ADL4LHCOpenData](https://github.com/ahmetcansansar/ADL4LHCOpenData) collection.
 
 ## Licence
 
