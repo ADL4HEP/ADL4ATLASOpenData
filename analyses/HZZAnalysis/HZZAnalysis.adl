@@ -17,7 +17,7 @@ object goodEles : ELE
   select abs(lep_trackd0pvunbiased(ELE))/lep_tracksigd0pvunbiased(ELE) < 5
 
 object goodMuos : MUO
-  select Pt(MUO) > 7
+  select Pt(MUO) > 5
   select absEta(MUO) < 2.5
   select lep_ptcone30(MUO)/lep_pt(MUO) < 0.3
   select lep_etcone20(MUO)/lep_pt(MUO) < 0.3

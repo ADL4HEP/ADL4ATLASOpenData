@@ -57,6 +57,7 @@ region ZZDibosonAnalysis
   preselections
   select CostZZ ~= 0
   select pdgID(Z1) == 0 AND pdgID(Z2) == 0
+  select Pt(goodLepts[0]) > 25 OR Pt(goodLepts[1]) > 25 OR Pt(goodLepts[2]) > 25 OR Pt(goodLepts[3]) > 25
   select ZZsum < 50
   histo hPtlep, " Leptons Transverse Momentum;p_{T}^{all lep} [GeV]; Leptons / bin", 20, 0, 200, Pt(goodLepts)
   histo hEtalep, "Leptons Pseudorapidity; #eta^{all lep}; Leptons / bin", 10, -3, 3, Eta(goodLepts)

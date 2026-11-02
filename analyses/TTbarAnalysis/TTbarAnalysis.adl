@@ -86,8 +86,8 @@ define mWjj = Mjj1 + Mjj2 + Mjj3
 
 region preselections
   weight evtWeight totalWeight
-  select MET > 30.0   # GeV
   select Size(JET) > 3
+  select MET > 30.0   # GeV
   select Size(goodEles) >= 0
   select Size(goodMuos) >= 0
   select Size(goodLepts) >= 0

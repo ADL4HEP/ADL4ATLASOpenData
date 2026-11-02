@@ -128,10 +128,12 @@ region preselections
     select Size(signalEles) >= 0
     select Size(signalMuos) >= 0
     select Size(signalLepts) == 2
-    select (Abs(pdgID(leadLept)) == 11 AND trigE == 1) OR (Abs(pdgID(leadLept)) == 13 AND trigM == 1)
+    select pdgID(leadLept) + pdgID(subleadLept) == 0
     select Pt(leadLept) > 25
     select Pt(subleadLept) > 20
     select max(absEta(signalMuos)) < 2.4
+    select (Abs(pdgID(leadLept)) == 11 AND trigE == 1) OR (Abs(pdgID(leadLept)) == 13 AND trigM == 1)
+    select mLL > 40
     select Size(JetsA) == 0
     select Size(JetsB) == 0
     select Size(JetsC) == 0
@@ -139,7 +141,6 @@ region preselections
 
 region SR2loose
     preselections
-    select pdgID(leadLept) + pdgID(subleadLept) == 0
     reject channelNumber == 364156 && MET > 1500
     select MT2 > 100
     select mLL > 111
@@ -151,7 +152,6 @@ region SR2loose
 
 region SR2tight
     preselections
-    select pdgID(leadLept) + pdgID(subleadLept) == 0
     reject channelNumber == 364156 && MET > 1500
     select MT2 > 130
     select mLL > 300

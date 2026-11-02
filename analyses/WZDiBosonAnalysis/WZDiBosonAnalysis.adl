@@ -76,13 +76,13 @@ region preselections
 region WZDiBosonAnalysis
   preselections
   select trigE == 1 OR trigM == 1
-  select MET > 30.0
   select Size(goodLepts) == 3
   select CostWZ ~= 0
   select pdgID(Lepton12) == 0
-  select Pt(goodLepts) > 25.0
   select Abs(m(Lepton12) - 91.18) < 10.0
   select MTW  > 30.0
+  select MET > 30.0
+  select Pt(goodLepts) > 25.0
 
   ## Global histograms variables
   histo hist_mLL           ,"Mass of Dilepton System; m_{ll} [GeV];Events / bin", 20, 76, 106, m(Lepton12)

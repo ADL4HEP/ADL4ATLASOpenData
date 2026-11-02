@@ -78,16 +78,16 @@ define HT = sum(Pt(goodEles[0:]))+ sum(Pt(goodMuos[0:])) + sum(Pt(goodJets[0:]))
 region SingleTopAnalysis
   select ALL
   weight evtweight totalWeight
-  select trigE == 1 OR trigM == 1
   select MET > 30.0
+  select trigE == 1 OR trigM == 1
   select Size(goodLepts) == 1
+  select MTW > 60.0
   select Size(goodJets) == 2
   select Size(goodBJets) == 1
-  select MTW > 60.0
-  select mlb < 150.0
-  select HT > 195.0
   select AbsEta(nonBJet) > 1.5
   select dEtajj > 1.5
+  select HT > 195.0
+  select mlb < 150.0
 
   histo hist_etmiss ,"Missing Transverse Momentum;E_{T}^{miss} [GeV];Events / bin", 20, 0, 200, MET
   histo hist_mtw, "Transverse Mass; M^{W}_{T} [GeV];Events / bin", 30, 0, 200, MTW
