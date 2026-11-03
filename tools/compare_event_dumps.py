@@ -9,6 +9,9 @@ files first, e.g. `cat data_A.csv data_B.csv data_C.csv data_D.csv > data.csv`. 
 file every (runNumber, eventNumber) must be unique; simulated samples all have the same
 runNumber, so duplicates are reported when MC samples are merged.
 
+Event numbers are compared as unsigned 32-bit values: the ntuples store them as int32, so
+CutLang writes large data event numbers as negative numbers and the framework as unsigned.
+
 Usage:
   python3 compare_event_dumps.py --files <cutlang.csv> <framework.csv> [--out <prefix>]
 """
@@ -32,6 +35,9 @@ def read_dump(path):
                 columns = fields
                 continue
             row = dict(zip(columns, fields))
+            # the ntuples store eventNumber as int32: CutLang writes it signed (data event numbers
+            # above 2^31-1 come out negative), the framework as unsigned; compare the unsigned value
+            row["eventNumber"] = str(int(row["eventNumber"]) % 2**32)
             key = (int(row["runNumber"]), int(row["eventNumber"]))
             if key in rows:
                 print(f"WARNING: duplicate event {key} in {path}", file=sys.stderr)
