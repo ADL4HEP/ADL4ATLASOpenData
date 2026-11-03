@@ -93,6 +93,29 @@ python3 scripts/normalize_merge.py ZBosonAnalysis \
 
 `--allow-missing` lets the merge proceed with only part of the samples.
 
+## Reduced benchmark (one command)
+
+Runs all nine analyses with CutLang on the 5000-event test skims in `tests/skims/` (local
+files, no network, under a minute) and compares every histogram and cutflow with the
+reference outputs in `tests/reference/`:
+
+```bash
+python3 scripts/reduced_benchmark.py --jobs 4
+```
+
+```
+ZBosonAnalysis           OK    max rel. diff 0
+...
+SUSYAnalysis             OK    max rel. diff 0
+Reduced benchmark: 9/9 analyses reproduce the reference outputs (outputs in run/reduced)
+```
+
+An analysis that differs from the reference is listed with the histograms and bins that
+differ; the exit code is then non-zero. The outputs are raw CutLang outputs of the skims
+(the normalisation in `config/samples/` refers to the full samples). The complete benchmark
+with all samples and 10 fb⁻¹ of data is described in the next section, and its results
+can be checked against `reference_results/` (see [Validation](#validation)).
+
 ## Running a full analysis
 
 ```bash
@@ -175,7 +198,17 @@ the ADL statement).
 ## Validation
 
 `tools/compare_cutlang_outputs.py A.root B.root` compares two CutLang outputs
-histogram by histogram, and cutflows bin by bin by label.
+histogram by histogram, and cutflows bin by bin by label (relative tolerance
+`--rtol`, default 10⁻⁶). To check a whole analysis against the reference outputs:
+
+```bash
+python3 tools/compare_cutlang_outputs.py --ref reference_results/TTbarAnalysis/CutLang \
+    --new run/TTbar/merged
+```
+
+Each `<group>.root` file gets OK or FAIL with its largest relative difference;
+a file or histogram of the reference missing from the new outputs is a failure.
+The exit code is non-zero if anything differs.
 
 - The single-ADL workflow with post-run normalisation was checked against the
   per-sample-ADL workflow used for the article: data, simulated and single-top
@@ -258,9 +291,13 @@ analyses/<A>/<A>.adl        one ADL per analysis, used for every sample
 config/samples/<A>.yaml     input files, cross-sections, sums of weights, merge groups
 scripts/run_analysis.py     run CutLang over the samples of an analysis
 scripts/normalize_merge.py  normalise MC by 1/(sumw*eff) and merge into groups
-tools/compare_cutlang_outputs.py  bin-by-bin comparison of two CutLang output files
+tools/compare_cutlang_outputs.py  bin-by-bin comparison of CutLang outputs (two files, or a run against reference_results/)
 tools/compare_event_dumps.py  event-by-event comparison with the Open Data framework dumps
 scripts/plot_all.py         plotting the merged outputs
+scripts/reduced_benchmark.py  reduced benchmark: all analyses on the test skims, compared with tests/reference/
+tests/skims/                5000-event test skims (+ skims.sha256)
+tests/reference/<A>/        reference outputs of the reduced benchmark
+reference_results/<A>/      reference outputs of the full benchmark (CutLang/, ODFramework/)
 docs/                       samples.md, download.md (+ download/<A>.txt URL lists, <A>.sha256 checksums)
 tools/bench_Zee.C           Running the Open Data framework for performance benchmark (Z boson analysis, Z→ee only)
 ```
