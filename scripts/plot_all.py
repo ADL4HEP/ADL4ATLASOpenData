@@ -1,15 +1,29 @@
 import ROOT
-import optparse
+import argparse
 import math
+import os
 
+# analysis name (directory under analyses/, as for run_analysis.py) -> short name used below and in the PDF names
+SHORT_NAMES = {
+    "ZBosonAnalysis": "Zboson",
+    "WBosonAnalysis": "Wboson",
+    "SingleTopAnalysis": "Singletop",
+    "ZPrimeBoostedAnalysis": "Zboosted",
+    "HZZAnalysis": "HZZ",
+    "ZZDiBosonAnalysis": "ZZdiboson",
+    "WZDiBosonAnalysis": "WZ",
+    "TTbarAnalysis": "ttbar",
+    "SUSYAnalysis": "SUSY",
+}
 
-parser = optparse.OptionParser()
+parser = argparse.ArgumentParser(usage="plot_all.py <analysis> --indir RUN/merged --outdir RUN/plots")
+parser.add_argument('analysis', choices = SHORT_NAMES, help = 'analysis name (directory name under analyses/)')
+parser.add_argument('--indir', default = '.', help = 'directory with the merged outputs (data.root, ...) [default: .]')
+parser.add_argument('--outdir', default = '.', help = 'directory for the PDF plots [default: .]')
+options = parser.parse_args()
 
-parser.add_option('-a', '--analysis', dest = 'analysis_name',
-                  help = 'name of the analysis for plotting:\n Zboson, Wboson, Singletop, Zboosted, HZZ, ZZdiboson, WZ, ttbar, SUSY, HWW, Ztau') 
-(options, args) = parser.parse_args()
-
-analysis_name = options.analysis_name
+analysis_name = SHORT_NAMES[options.analysis]
+os.makedirs(options.outdir, exist_ok = True)
 
 
 def plotting(region_name, hist_name, max_range):
@@ -20,11 +34,11 @@ def plotting(region_name, hist_name, max_range):
     hist_name = str(hist_name)
 
     if analysis_name == "Zboosted":
-        datafile = ROOT.TFile("data.root","READ")
-        stopfile = ROOT.TFile("stop.root","READ")
-        Vfile = ROOT.TFile("V.root","READ")
-        dibosonfile = ROOT.TFile("diboson.root","READ")
-        ttbarfile = ROOT.TFile("ttbar.root","READ")
+        datafile = ROOT.TFile(os.path.join(options.indir, "data.root"),"READ")
+        stopfile = ROOT.TFile(os.path.join(options.indir, "stop.root"),"READ")
+        Vfile = ROOT.TFile(os.path.join(options.indir, "V.root"),"READ")
+        dibosonfile = ROOT.TFile(os.path.join(options.indir, "diboson.root"),"READ")
+        ttbarfile = ROOT.TFile(os.path.join(options.indir, "ttbar.root"),"READ")
 
         datacutflow = datafile.Get("{}/cutflow".format(region_name))
         stopcutflow = stopfile.Get("{}/cutflow".format(region_name))
@@ -55,11 +69,11 @@ def plotting(region_name, hist_name, max_range):
         datahist.AddBinContent(n_bins_data, datahist.GetBinContent(n_bins_data + 1))
     
     elif analysis_name == "HZZ":
-        datafile = ROOT.TFile("data.root","READ")
-        sigfile = ROOT.TFile("Higgs.root","READ")
-        othersfile = ROOT.TFile("V.root","READ")
-        ZZfile = ROOT.TFile("ZZ.root","READ")
-        #SMfile = ROOT.TFile("histoOut-allSM.root","READ")
+        datafile = ROOT.TFile(os.path.join(options.indir, "data.root"),"READ")
+        sigfile = ROOT.TFile(os.path.join(options.indir, "Higgs.root"),"READ")
+        othersfile = ROOT.TFile(os.path.join(options.indir, "V.root"),"READ")
+        ZZfile = ROOT.TFile(os.path.join(options.indir, "ZZ.root"),"READ")
+        #SMfile = ROOT.TFile(os.path.join(options.indir, "histoOut-allSM.root"),"READ")
 
         datacutflow = datafile.Get("{}/cutflow".format(region_name))
         sigcutflow = sigfile.Get("{}/cutflow".format(region_name))
@@ -86,13 +100,13 @@ def plotting(region_name, hist_name, max_range):
             datahist.AddBinContent(n_bins_data, datahist.GetBinContent(n_bins_data + 1))
 
     elif analysis_name == "Zboson":
-        datafile = ROOT.TFile("data.root","READ")
-        Zfile = ROOT.TFile("Zjets.root","READ")
-        Wfile = ROOT.TFile("Wjets.root","READ")
-        stopfile = ROOT.TFile("stop.root","READ")
-        ttbarfile = ROOT.TFile("ttbar.root","READ")
-        dibosonfile = ROOT.TFile("diboson.root","READ")
-        #SMfile = ROOT.TFile("histoOut-allSM.root","READ")
+        datafile = ROOT.TFile(os.path.join(options.indir, "data.root"),"READ")
+        Zfile = ROOT.TFile(os.path.join(options.indir, "Zjets.root"),"READ")
+        Wfile = ROOT.TFile(os.path.join(options.indir, "Wjets.root"),"READ")
+        stopfile = ROOT.TFile(os.path.join(options.indir, "stop.root"),"READ")
+        ttbarfile = ROOT.TFile(os.path.join(options.indir, "ttbar.root"),"READ")
+        dibosonfile = ROOT.TFile(os.path.join(options.indir, "diboson.root"),"READ")
+        #SMfile = ROOT.TFile(os.path.join(options.indir, "histoOut-allSM.root"),"READ")
 
         datacutflow = datafile.Get("{}/cutflow".format(region_name))
         Zcutflow = Zfile.Get("{}/cutflow".format(region_name))
@@ -128,12 +142,12 @@ def plotting(region_name, hist_name, max_range):
         datahist.AddBinContent(n_bins_data, datahist.GetBinContent(n_bins_data + 1))
     
     elif analysis_name == "Wboson":
-        datafile = ROOT.TFile("data.root","READ")
-        stopfile = ROOT.TFile("stop.root","READ")
-        dibosonfile = ROOT.TFile("diboson.root","READ")
-        zfile = ROOT.TFile("Zjets.root","READ")
-        ttbarfile = ROOT.TFile("ttbar.root","READ")
-        wjetsfile = ROOT.TFile("Wjets.root","READ")
+        datafile = ROOT.TFile(os.path.join(options.indir, "data.root"),"READ")
+        stopfile = ROOT.TFile(os.path.join(options.indir, "stop.root"),"READ")
+        dibosonfile = ROOT.TFile(os.path.join(options.indir, "diboson.root"),"READ")
+        zfile = ROOT.TFile(os.path.join(options.indir, "Zjets.root"),"READ")
+        ttbarfile = ROOT.TFile(os.path.join(options.indir, "ttbar.root"),"READ")
+        wjetsfile = ROOT.TFile(os.path.join(options.indir, "Wjets.root"),"READ")
 
         datacutflow = datafile.Get("{}/cutflow".format(region_name))
         stopcutflow = stopfile.Get("{}/cutflow".format(region_name))
@@ -169,11 +183,11 @@ def plotting(region_name, hist_name, max_range):
         datahist.AddBinContent(n_bins_data, datahist.GetBinContent(n_bins_data + 1))
 
     elif analysis_name == "Singletop":
-        datafile = ROOT.TFile("data.root","READ")
-        stopfile = ROOT.TFile("stop_tchan.root","READ")
-        dibosonfile = ROOT.TFile("ZVV.root","READ")
-        ttbarfile = ROOT.TFile("stop_tWtb.root","READ")
-        wjetsfile = ROOT.TFile("Wjets.root","READ")
+        datafile = ROOT.TFile(os.path.join(options.indir, "data.root"),"READ")
+        stopfile = ROOT.TFile(os.path.join(options.indir, "stop_tchan.root"),"READ")
+        dibosonfile = ROOT.TFile(os.path.join(options.indir, "ZVV.root"),"READ")
+        ttbarfile = ROOT.TFile(os.path.join(options.indir, "stop_tWtb.root"),"READ")
+        wjetsfile = ROOT.TFile(os.path.join(options.indir, "Wjets.root"),"READ")
 
         datacutflow = datafile.Get("{}/cutflow".format(region_name))
         stopcutflow = stopfile.Get("{}/cutflow".format(region_name))
@@ -204,10 +218,10 @@ def plotting(region_name, hist_name, max_range):
         datahist.AddBinContent(n_bins_data, datahist.GetBinContent(n_bins_data + 1))
     
     elif analysis_name == "ZZdiboson":
-        datafile = ROOT.TFile("data.root","READ")
-        topVfile = ROOT.TFile("topV.root","READ")
-        WWZfile = ROOT.TFile("WWZ.root","READ")
-        Z_Zfile = ROOT.TFile("ZZ.root","READ")
+        datafile = ROOT.TFile(os.path.join(options.indir, "data.root"),"READ")
+        topVfile = ROOT.TFile(os.path.join(options.indir, "topV.root"),"READ")
+        WWZfile = ROOT.TFile(os.path.join(options.indir, "WWZ.root"),"READ")
+        Z_Zfile = ROOT.TFile(os.path.join(options.indir, "ZZ.root"),"READ")
 
         datacutflow = datafile.Get("{}/cutflow".format(region_name))
         topVcutflow = topVfile.Get("{}/cutflow".format(region_name))
@@ -233,11 +247,11 @@ def plotting(region_name, hist_name, max_range):
         datahist.AddBinContent(n_bins_data, datahist.GetBinContent(n_bins_data + 1))
 
     elif analysis_name == "WZ":
-        datafile = ROOT.TFile("data.root","READ")
-        Vfile = ROOT.TFile("V.root","READ")
-        VVfile = ROOT.TFile("VV.root","READ")
-        topfile = ROOT.TFile("top.root","READ")
-        WZfile = ROOT.TFile("WZ.root","READ")
+        datafile = ROOT.TFile(os.path.join(options.indir, "data.root"),"READ")
+        Vfile = ROOT.TFile(os.path.join(options.indir, "V.root"),"READ")
+        VVfile = ROOT.TFile(os.path.join(options.indir, "VV.root"),"READ")
+        topfile = ROOT.TFile(os.path.join(options.indir, "top.root"),"READ")
+        WZfile = ROOT.TFile(os.path.join(options.indir, "WZ.root"),"READ")
 
         datacutflow = datafile.Get("{}/cutflow".format(region_name))
         Vcutflow = Vfile.Get("{}/cutflow".format(region_name))
@@ -268,11 +282,11 @@ def plotting(region_name, hist_name, max_range):
         datahist.AddBinContent(n_bins_data, datahist.GetBinContent(n_bins_data + 1))
 
     elif analysis_name == "ttbar":
-        datafile = ROOT.TFile("data.root","READ")
-        dibosonfile = ROOT.TFile("diboson.root", "READ")
-        stopfile = ROOT.TFile("stop.root", "READ")
-        Vfile = ROOT.TFile("V.root", "READ")
-        ttbarfile = ROOT.TFile("ttbar.root", "READ")
+        datafile = ROOT.TFile(os.path.join(options.indir, "data.root"),"READ")
+        dibosonfile = ROOT.TFile(os.path.join(options.indir, "diboson.root"), "READ")
+        stopfile = ROOT.TFile(os.path.join(options.indir, "stop.root"), "READ")
+        Vfile = ROOT.TFile(os.path.join(options.indir, "V.root"), "READ")
+        ttbarfile = ROOT.TFile(os.path.join(options.indir, "ttbar.root"), "READ")
 
         datacutflow = datafile.Get("{}/cutflow".format(region_name))
         dibosoncutflow = dibosonfile.Get("{}/cutflow".format(region_name))
@@ -304,13 +318,13 @@ def plotting(region_name, hist_name, max_range):
             datahist.AddBinContent(n_bins_data, datahist.GetBinContent(n_bins_data + 1))
 
     elif analysis_name == "SUSY":
-        datafile = ROOT.TFile("data.root","READ")
-        dibosonfile = ROOT.TFile("diboson.root","READ")
-        Wfile = ROOT.TFile("Wjets.root","READ")
-        Zfile = ROOT.TFile("Zjets.root","READ")
-        ttbarfile = ROOT.TFile("ttbar.root","READ")
-        stopfile = ROOT.TFile("stop.root","READ")
-        susyfile = ROOT.TFile("signal.root","READ")
+        datafile = ROOT.TFile(os.path.join(options.indir, "data.root"),"READ")
+        dibosonfile = ROOT.TFile(os.path.join(options.indir, "diboson.root"),"READ")
+        Wfile = ROOT.TFile(os.path.join(options.indir, "Wjets.root"),"READ")
+        Zfile = ROOT.TFile(os.path.join(options.indir, "Zjets.root"),"READ")
+        ttbarfile = ROOT.TFile(os.path.join(options.indir, "ttbar.root"),"READ")
+        stopfile = ROOT.TFile(os.path.join(options.indir, "stop.root"),"READ")
+        susyfile = ROOT.TFile(os.path.join(options.indir, "signal.root"),"READ")
         
         datacutflow = datafile.Get("{}/cutflow".format(region_name))
         dibosoncutflow = dibosonfile.Get("{}/cutflow".format(region_name))
@@ -346,83 +360,6 @@ def plotting(region_name, hist_name, max_range):
 
         n_bins_data = datahist.GetNbinsX()
         datahist.AddBinContent(n_bins_data, datahist.GetBinContent(n_bins_data + 1))
-
-    elif analysis_name == "HWW":
-        datafile = ROOT.TFile("data.root","READ")
-        higgsfile = ROOT.TFile("higgs.root","READ")
-        ttbarfile = ROOT.TFile("ttbar.root","READ")
-        dibosonfile = ROOT.TFile("diboson.root","READ")
-        Vfile = ROOT.TFile("V.root","READ")
-        stopfile = ROOT.TFile("stop.root","READ")
-
-        datacutflow = datafile.Get("{}/cutflow".format(region_name))
-        higgscutflow = higgsfile.Get("{}/cutflow".format(region_name))
-        ttbarcutflow = ttbarfile.Get("{}/cutflow".format(region_name))
-        dibosoncutflow = dibosonfile.Get("{}/cutflow".format(region_name))
-        Vcutflow = Vfile.Get("{}/cutflow".format(region_name))
-        stopcutflow = stopfile.Get("{}/cutflow".format(region_name))
-
-        datahist = datafile.Get("{}/{}".format(region_name, hist_name))
-        higgshist = higgsfile.Get("{}/{}".format(region_name, hist_name))
-        ttbarhist = ttbarfile.Get("{}/{}".format(region_name, hist_name))
-        dibosonhist = dibosonfile.Get("{}/{}".format(region_name, hist_name))
-        Vhist = Vfile.Get("{}/{}".format(region_name, hist_name))
-        stophist = stopfile.Get("{}/{}".format(region_name, hist_name))
-
-        ## Overflow
-        n_bins_data = datahist.GetNbinsX()
-        datahist.AddBinContent(n_bins_data, datahist.GetBinContent(n_bins_data + 1))
-        
-        n_bins_higgs = higgshist.GetNbinsX()
-        higgshist.AddBinContent(n_bins_higgs, higgshist.GetBinContent(n_bins_higgs + 1))
-
-        n_bins_ttbar = ttbarhist.GetNbinsX()
-        ttbarhist.AddBinContent(n_bins_ttbar, ttbarhist.GetBinContent(n_bins_ttbar + 1))
-
-        n_bins_diboson = dibosonhist.GetNbinsX()
-        dibosonhist.AddBinContent(n_bins_diboson, dibosonhist.GetBinContent(n_bins_diboson + 1))
-
-        n_bins_V = Vhist.GetNbinsX()
-        Vhist.AddBinContent(n_bins_V, Vhist.GetBinContent(n_bins_V + 1))
-
-        n_bins_stop = stophist.GetNbinsX()
-        stophist.AddBinContent(n_bins_stop, stophist.GetBinContent(n_bins_stop + 1))
-
-    elif analysis_name == "Ztau":
-        datafile = ROOT.TFile("data.root","READ")
-        topVfile = ROOT.TFile("topV.root","READ")
-        Wfile = ROOT.TFile("W.root","READ")
-        Zfile = ROOT.TFile("Z.root","READ")
-        Ztaufile = ROOT.TFile("Ztau.root","READ")
-
-        datacutflow = datafile.Get("{}/cutflow".format(region_name))
-        topVcutflow = topVfile.Get("{}/cutflow".format(region_name))
-        Wcutflow = Wfile.Get("{}/cutflow".format(region_name))
-        Zcutflow = Zfile.Get("{}/cutflow".format(region_name))
-        Ztaucutflow = Ztaufile.Get("{}/cutflow".format(region_name))
-        
-        datahist = datafile.Get("{}/{}".format(region_name, hist_name))
-        topVhist = topVfile.Get("{}/{}".format(region_name, hist_name))
-        Whist = Wfile.Get("{}/{}".format(region_name, hist_name))
-        Zhist = Zfile.Get("{}/{}".format(region_name, hist_name))
-        Ztauhist = Ztaufile.Get("{}/{}".format(region_name, hist_name))
-
-        ## Overflow
-        n_bins_data = datahist.GetNbinsX()
-        datahist.AddBinContent(n_bins_data, datahist.GetBinContent(n_bins_data + 1))
-
-
-        n_bins_topV = topVhist.GetNbinsX()
-        topVhist.AddBinContent(n_bins_topV, topVhist.GetBinContent(n_bins_topV + 1))
-
-        n_bins_W = Whist.GetNbinsX()
-        Whist.AddBinContent(n_bins_W, Whist.GetBinContent(n_bins_W + 1))
-
-        n_bins_Z = Zhist.GetNbinsX()
-        Zhist.AddBinContent(n_bins_Z, Zhist.GetBinContent(n_bins_Z + 1))
-
-        n_bins_Ztau = Ztauhist.GetNbinsX()
-        Ztauhist.AddBinContent(n_bins_Ztau, Ztauhist.GetBinContent(n_bins_Ztau + 1))
 
     ### hist title
     max_range = float(max_range)
@@ -542,31 +479,6 @@ def plotting(region_name, hist_name, max_range):
         hs.Add(dibosonhist)
         hs.Add(Zhist)
 
-    elif analysis_name == "HWW":
-        higgshist.SetFillColor(ROOT.kRed)
-        ttbarhist.SetFillColor(ROOT.kOrange-3)
-        dibosonhist.Scale(1.3)
-        dibosonhist.SetFillColor(ROOT.kBlue-6)
-        Vhist.SetFillColor(ROOT.kGreen-3)
-        stophist.SetFillColor(ROOT.kAzure+8)
-        
-        hs.Add(stophist)
-        hs.Add(ttbarhist)
-        hs.Add(Vhist)
-        hs.Add(dibosonhist)
-        hs.Add(higgshist)
-
-    elif analysis_name == "Ztau":
-        topVhist.SetFillColor(ROOT.kOrange-3)
-        Whist.SetFillColor(ROOT.kGreen-3)
-        Zhist.SetFillColor(ROOT.kPink+9)
-        Ztauhist.SetFillColor(ROOT.kAzure+7)
-
-        hs.Add(topVhist)
-        hs.Add(Whist)
-        hs.Add(Zhist)
-        hs.Add(Ztauhist)
-
     if analysis_name == "Zboson" or (analysis_name == "ttbar" and hist_name != "hist_Topmass"): 
         hs.SetMinimum(100)
     elif analysis_name == "SUSY": #or (analysis_name == "ttbar" and hist_name != "hist_Topmass"):
@@ -636,20 +548,6 @@ def plotting(region_name, hist_name, max_range):
         rstack.Add(dibosonhist)
         rstack.Add(Whist)
         rstack.Add(stophist)
-
-    elif analysis_name == "HWW":
-        rstack = ttbarhist.Clone()
-        rstack.Add(dibosonhist)
-        rstack.Add(Vhist)
-        rstack.Add(stophist)
-        rstack.Add(higgshist)
-
-    elif analysis_name == "Ztau":
-        rstack = topVhist.Clone()
-        rstack.Add(Whist)
-        rstack.Add(Zhist)
-        rstack.Add(Ztauhist)
-
 
     stat_unc = rstack.Clone("stat_unc")
     stat_unc.SetFillStyle(3454)
@@ -1033,21 +931,6 @@ def plotting(region_name, hist_name, max_range):
         Zyieldstr = "Z+jets"
         Wyieldstr = "W+jets"
 
-    elif analysis_name == "HWW":
-        datayieldstr = "DATA"
-        higgsyieldstr = "Higgs"
-        stopyieldstr = "Single top"
-        dibosonyieldstr = "Diboson"
-        ttbaryieldstr = "t#bar{t}"
-        Vyieldstr = "V + jets"
-
-    elif analysis_name == "Ztau":
-        datayieldstr = "DATA"
-        Ztauyieldstr = "Z #rightarrow #tau#tau"
-        Zyieldstr = "Z #rightarrow ee, #mu#mu"
-        Wyieldstr = "W + jets"
-        topVyieldstr = "Other"
-
     #c1.Print("plots.pdf")
 
     ##Legend
@@ -1122,21 +1005,6 @@ def plotting(region_name, hist_name, max_range):
         leg.AddEntry(stophist,stopyieldstr,"f")
         leg.AddEntry(Whist,Wyieldstr,"f")
         #leg.AddEntry(susyhist,"m(#tilde{l},#chi^{0}_{1})=(600,300) GeV","l")
-
-    elif analysis_name == "HWW":
-        leg.AddEntry(datahist,datayieldstr,"p")
-        leg.AddEntry(higgshist,higgsyieldstr,"f")
-        leg.AddEntry(dibosonhist,dibosonyieldstr,"f")
-        leg.AddEntry(Vhist,Vyieldstr,"f")
-        leg.AddEntry(ttbarhist,ttbaryieldstr,"f")
-        leg.AddEntry(stophist,stopyieldstr,"f")
-
-    elif analysis_name == "Ztau":
-        leg.AddEntry(datahist,datayieldstr,"p")
-        leg.AddEntry(Ztauhist,Ztauyieldstr,"f")
-        leg.AddEntry(Zhist,Zyieldstr,"f")
-        leg.AddEntry(Whist,Wyieldstr,"f")
-        leg.AddEntry(topVhist,topVyieldstr,"f")
 
     leg.AddEntry(stat_unc, "Stat. unc.", "f")
     if analysis_name == "SUSY":
@@ -1246,37 +1114,32 @@ def plotting(region_name, hist_name, max_range):
 
 
     if analysis_name == "Zboosted":
-        c1.Print("{}_Zprime.pdf".format(hist_name))
+        c1.Print(os.path.join(options.outdir, "{}_Zprime.pdf".format(hist_name)))
 
     elif analysis_name == "HZZ":
-        c1.Print("{}_HZZ.pdf".format(hist_name))
+        c1.Print(os.path.join(options.outdir, "{}_HZZ.pdf".format(hist_name)))
     
     elif analysis_name == "Zboson":
-        c1.Print("{}_Zboson.pdf".format(hist_name))
+        c1.Print(os.path.join(options.outdir, "{}_Zboson.pdf".format(hist_name)))
 
     elif analysis_name == "Wboson":
-        c1.Print("{}_Wboson.pdf".format(hist_name))
+        c1.Print(os.path.join(options.outdir, "{}_Wboson.pdf".format(hist_name)))
 
     elif analysis_name == "Singletop":
-        c1.Print("{}_Singletop.pdf".format(hist_name))
+        c1.Print(os.path.join(options.outdir, "{}_Singletop.pdf".format(hist_name)))
 
     elif analysis_name == "ZZdiboson":
-        c1.Print("{}_ZZdiboson.pdf".format(hist_name))
+        c1.Print(os.path.join(options.outdir, "{}_ZZdiboson.pdf".format(hist_name)))
 
     elif analysis_name == "WZ":
-        c1.Print("{}_WZ.pdf".format(hist_name))
+        c1.Print(os.path.join(options.outdir, "{}_WZ.pdf".format(hist_name)))
 
     elif analysis_name == "ttbar":
-        c1.Print("{}_ttbar.pdf".format(hist_name))
+        c1.Print(os.path.join(options.outdir, "{}_ttbar.pdf".format(hist_name)))
 
     elif analysis_name == "SUSY":
-        c1.Print("{}_SUSY.pdf".format(hist_name))
+        c1.Print(os.path.join(options.outdir, "{}_SUSY.pdf".format(hist_name)))
 
-    elif analysis_name == "HWW":
-        c1.Print("{}_HWW.pdf".format(hist_name))
-
-    elif analysis_name == "Ztau":
-        c1.Print("{}_Ztau.pdf".format(hist_name))
     #### cutflows ####
     print("%80s" % "%%%%%%%%%%%%% Cutflows for the analysis samples %%%%%%%%%%")
     if analysis_name == "Zboson":
@@ -1716,98 +1579,6 @@ def plotting(region_name, hist_name, max_range):
         print("Single top:           %.02f" % stophist.Integral())
         print("W:           %.02f" % Whist.Integral())
 
-    elif analysis_name == "HWW":
-        print("{:<30} {:<20} {:<20} {:<20} {:<20} {:<20} {:<20}".format(
-        "Cut Name",
-        "DATA",
-        "Higgs",
-        "Diboson",
-        "V+jets",
-        "ttbar",
-        "Single top"
-        ))
-        print(" ")
-
-        for i in range(2,40,1): 
-            cutnamedata = datacutflow.GetXaxis().GetBinLabel(i)
-            if "Histo" in cutnamedata: continue
-            cutvalue_data = datacutflow.GetBinContent(i)
-            error_data = datacutflow.GetBinError(i)
-            cutvalue_ttbar = ttbarcutflow.GetBinContent(i)
-            error_ttbar = ttbarcutflow.GetBinError(i)
-            error_V = Vcutflow.GetBinError(i)
-            cutvalue_V = Vcutflow.GetBinContent(i)
-            error_diboson = dibosoncutflow.GetBinError(i)
-            cutvalue_diboson = dibosoncutflow.GetBinContent(i)
-            error_stop = stopcutflow.GetBinError(i)
-            cutvalue_stop = stopcutflow.GetBinContent(i)
-            error_higgs = higgscutflow.GetBinError(i)
-            cutvalue_higgs = higgscutflow.GetBinContent(i)
-            #print("{:<30} {:.2e} +- {:.2e}    {:.2e} +- {:.2e}    {:.2e} +- {:.2e}    {:.2e} +- {:.2e}  {:.2e} +- {:.2e} {:.2e} +- {:.2e}".format(
-            print("{:<30} {:.2f} +- {:.2f}    {:.2f} +- {:.2f}    {:.2f} +- {:.2f}    {:.2f} +- {:.2f}  {:.2f} +- {:.2f} {:.2f} +- {:.2f}".format(
-            cutnamedata,
-            cutvalue_data, error_data,
-            cutvalue_higgs, error_higgs,
-            cutvalue_diboson, error_diboson,
-            cutvalue_V, error_V,
-            cutvalue_ttbar, error_ttbar,
-            cutvalue_stop,    error_stop
-            ))
-
-        print(" ")
-        print("")
-        print("{} Region Final Yields: ".format(region_name))
-        print("Data:         %.02f"% datahist.Integral())
-        print("V:       %.02f"% Vhist.Integral())
-        print("Diboson:           %.02f"% dibosonhist.Integral())
-        print("ttbar:           %.02f" % ttbarhist.Integral())
-        print("Single top:           %.02f" % stophist.Integral())
-        print("Higgs:           %.02f" % higgshist.Integral())
-
-    elif analysis_name == "Ztau":
-        print("{:<30} {:<20} {:<20} {:<20} {:<20} {:<20}".format(
-        "Cut Name",
-        "DATA",
-        "Ztau",
-        "Z",
-        "W +jets",
-        "Other"
-        ))
-        print(" ")
-
-        for i in range(2,40,1): 
-            cutnamedata = datacutflow.GetXaxis().GetBinLabel(i)
-            if "Histo" in cutnamedata: continue
-            cutvalue_data = datacutflow.GetBinContent(i)
-            error_data = datacutflow.GetBinError(i)
-            cutvalue_Ztau = Ztaucutflow.GetBinContent(i)
-            error_Ztau = Ztaucutflow.GetBinError(i)
-            error_Z = Zcutflow.GetBinError(i)
-            cutvalue_Z = Zcutflow.GetBinContent(i)
-            error_W = Wcutflow.GetBinError(i)
-            cutvalue_W = Wcutflow.GetBinContent(i)
-            error_topV = topVcutflow.GetBinError(i)
-            cutvalue_topV = topVcutflow.GetBinContent(i)
-            #print("{:<30} {:.2e} +- {:.2e}    {:.2e} +- {:.2e}    {:.2e} +- {:.2e}    {:.2e} +- {:.2e}  {:.2e} +- {:.2e}".format(
-            print("{:<30} {:.2f} +- {:.2f}    {:.2f} +- {:.2f}    {:.2f} +- {:.2f}    {:.2f} +- {:.2f}  {:.2f} +- {:.2f}".format(
-            cutnamedata,
-            cutvalue_data, error_data,
-            cutvalue_Ztau, error_Ztau,
-            cutvalue_Z, error_Z,
-            cutvalue_W, error_W,
-            cutvalue_topV, error_topV
-            ))
-
-        print(" ")
-        print("")
-        print("{} Region Final Yields: ".format(region_name))
-        print("Data:         %.02f"% datahist.Integral())
-        print("Ztau:       %.02f"% Ztauhist.Integral())
-        print("Z:           %.02f"% Zhist.Integral())
-        print("W:           %.02f" % Whist.Integral())
-        print("Other:           %.02f" % topVhist.Integral())
-
-
 if __name__ == "__main__":
     if analysis_name == "Zboosted":
         plotting("Zprime","hleadLRpt",23000)
@@ -1890,19 +1661,3 @@ if __name__ == "__main__":
         plotting("SR2loose","histetmiss_SR2_loose",1e5)
         plotting("SR2tight","histmt2_SR2_tight",1e5)
         plotting("SR2tight","histetmiss_SR2_tight",1e5)
-
-    elif analysis_name == "HWW":
-        #plotting("HWW","histI_dPhi_LL",30e3)
-        #plotting("HWW","histI_ptLL",35e3)
-        #plotting("HWW","histI_etmiss",50e3)
-        #plotting("HWW","histI_mt",24e3)
-        #plotting("HWW","hist_dPhi_LL",600)
-        #plotting("HWW","hist_ptLL",1100)
-        plotting("HWW","hist_etmiss",1200)
-        #plotting("HWW","hist_mt",900)
-
-    elif analysis_name == "Ztau":
-        #plotting("tautau","hist_taueta",3000)
-        #plotting("tautau","hist_tauphi",1900)
-        #plotting("tautau","hist_taupt",5500)
-        plotting("tautau","hist_tauE",7500)

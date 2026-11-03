@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """Compare the events selected by ADL/CutLang and by the ATLAS Open Data framework.
 
-Events are matched on (runNumber, eventNumber), sample by sample. The script prints how many
-events both select, and every event that only one of them selects.
+Events of the two dump files are matched on (runNumber, eventNumber). The script prints how
+many events both select, and every event that only one of them selects.
 
-  CutLang:   <cutlang_dir>/<sample>/<cutlang_file>   (data_A ... data_D should be combined into "data" if needed)
-  Open Data Framework: <framework_dir>/<sample>.csv            (data_A ... data_D should be combined into "data" if needed)
+A dump file can hold one sample or a merged group: for a group, concatenate the per-sample
+files first, e.g. `cat data_A.csv data_B.csv data_C.csv data_D.csv > data.csv`. Within a
+file every (runNumber, eventNumber) must be unique; simulated samples all have the same
+runNumber, so duplicates are reported when MC samples are merged.
 
 Usage:
-  python3 compare_event_dumps.py <cutlang_dir> <cutlang_file> <framework_dir> [--out <prefix>]
+  python3 compare_event_dumps.py --files <cutlang.csv> <framework.csv> [--out <prefix>]
 """
 import argparse
 import csv
-import os
 import sys
 
 DROP = {"EventNo", "totalWeight"}  # not needed for the comparison
@@ -38,53 +39,31 @@ def read_dump(path):
     return [c for c in columns if c not in DROP], rows
 
 
-def cutlang_sample(sample):
-    return "data" if sample.startswith("data_") else sample
-
-
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("cutlang_dir")
-    p.add_argument("cutlang_file")
-    p.add_argument("framework_dir")
+    p.add_argument("--files", nargs=2, required=True, metavar=("CUTLANG_CSV", "FRAMEWORK_CSV"))
     p.add_argument("--out", help="write <prefix>_cutlang_only.csv and <prefix>_framework_only.csv")
     a = p.parse_args()
 
-    cl, cl_cols = {}, None
-    for d in sorted(os.listdir(a.cutlang_dir)):
-        path = os.path.join(a.cutlang_dir, d, a.cutlang_file)
-        if os.path.isfile(path):
-            cl_cols, rows = read_dump(path)
-            cl.setdefault(cutlang_sample(d), {}).update(rows)
+    cl_cols, cl = read_dump(a.files[0])
+    fw_cols, fw = read_dump(a.files[1])
 
-    fw, fw_cols = {}, None
-    for f in sorted(os.listdir(a.framework_dir)):
-        if f.endswith(".csv"):
-            fw_cols, fw[f[:-4]] = read_dump(os.path.join(a.framework_dir, f))
+    print(f"{'Both':>10}{'CutLang only':>16}{'Open Data Framework only':>28}")
+    print(f"{len(cl.keys() & fw.keys()):>10}{len(cl.keys() - fw.keys()):>16}{len(fw.keys() - cl.keys()):>28}")
 
-    only = {"cutlang": [], "framework": []}
-    print(f"{'Sample':<24}{'Both':>10}{'CutLang only':>14}{'Open Data Framework only':>16}")
-    for s in sorted(set(cl) | set(fw)):
-        if s not in fw or s not in cl:
-            print(f"{s:<24}  missing in {'framework' if s not in fw else 'CutLang'} output")
+    for side, cols, mine, other in (("cutlang", cl_cols, cl, fw), ("framework", fw_cols, fw, cl)):
+        only = [mine[k] for k in sorted(mine.keys() - other.keys())]
+        if not only:
             continue
-        c, f = cl[s], fw[s]
-        print(f"{s:<24}{len(c.keys() & f.keys()):>10}{len(c.keys() - f.keys()):>14}{len(f.keys() - c.keys()):>16}")
-        only["cutlang"] += [[s] + c[k] for k in sorted(c.keys() - f.keys())]
-        only["framework"] += [[s] + f[k] for k in sorted(f.keys() - c.keys())]
-
-    for side, cols in (("cutlang", cl_cols), ("framework", fw_cols)):
-        if not only[side]:
-            continue
-        print(f"\nSelected by {side} only:")
-        print("  " + ", ".join(["sample"] + cols))
-        for row in only[side]:
-            print("  " + ", ".join(row))
-        if a.out:
+        if a.out:  # written before printing, so a cut-off terminal output does not lose it
             with open(f"{a.out}_{side}_only.csv", "w", newline="") as f:
                 w = csv.writer(f)
-                w.writerow(["sample"] + cols)
-                w.writerows(only[side])
+                w.writerow(cols)
+                w.writerows(only)
+        print(f"\nSelected by {side} only:")
+        print("  " + ", ".join(cols))
+        for row in only:
+            print("  " + ", ".join(row))
 
 
 if __name__ == "__main__":

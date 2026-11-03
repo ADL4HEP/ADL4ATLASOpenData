@@ -16,6 +16,9 @@ The analyses reproduce the educational analyses of the
 at tag **`10fb-legacy`** (commit `688d73f`). That tag corresponds to the 2020
 10 fb⁻¹ release; the main branch of the framework repository now targets newer
 ATLAS Open Data releases and is **not** the reference for this suite.
+The framework outputs used for the validation come from a fork of that tag,
+`10fb-legacy-validation-v1`, which only adds cutflows and event dumps (see
+[Open Data framework outputs for validation](#open-data-framework-outputs-for-validation)).
 
 > Status: pre-release. Planned for v1.0.0: container image, reference outputs
 > and automated comparison tests, plotting scripts for the article figures.
@@ -46,7 +49,7 @@ commands and SHA-256 checksums to check the downloaded files. The complete list 
 | Software | Version used for the article | Notes |
 |---|---|---|
 | CutLang | v2.16.0 (`1f880fc`) | needs ROOT, flex and bison to build |
-| ROOT | 6.36.12 | with PyROOT and XRootD (for streaming the samples) |
+| ROOT | 6.30.02 | with PyROOT and XRootD (for streaming the samples) |
 | Python | 3.9 or newer | packages: `pyyaml`, `numpy`, `uproot` |
 | OS | Linux or macOS | tested on Linux RHEL9 and macOS 26 (arm64) |
 
@@ -95,6 +98,7 @@ python3 scripts/normalize_merge.py ZBosonAnalysis \
 ```bash
 python3 scripts/run_analysis.py TTbarAnalysis --outdir run/TTbar/samples --jobs 4
 python3 scripts/normalize_merge.py TTbarAnalysis --indir run/TTbar/samples --outdir run/TTbar/merged
+python3 scripts/plot_all.py TTbarAnalysis --indir run/TTbar/merged --outdir run/TTbar/plots
 ```
 
 The analysis name is the directory name under `analyses/`. The run is
@@ -132,12 +136,20 @@ python3 scripts/run_analysis.py WZDiBosonAnalysis --outdir run/WZ/samples \
 | `--per-sample` | also write each normalised sample to `<outdir>/samples/<sample>.root` |
 | `--allow-missing` | merge groups from the samples that are present |
 
+### `plot_all.py` options
+
+| Option | Meaning |
+|---|---|
+| `--indir DIR` | merged `<group>.root` files from `normalize_merge.py` (default: current directory) |
+| `--outdir DIR` | where the `<histogram>_<short name>.pdf` plots go (default: current directory) |
+
 ## Outputs
 
 ```
 run/<analysis>/samples/histoOut-<ntuple>.root   one CutLang output per sample (unnormalised MC)
 run/<analysis>/samples/logs/<sample>.log        CutLang log per sample
 run/<analysis>/merged/<group>.root              normalised and merged, one file per group
+run/<analysis>/plots/<histogram>_<short>.pdf    plots from plot_all.py (e.g. hist_mtw_ttbar.pdf)
 ```
 
 Each output file has one directory per ADL `region`, containing the region's
@@ -162,7 +174,7 @@ the ADL statement).
 
 ## Validation
 
-`scripts/compare_outputs.py A.root B.root` compares two CutLang outputs
+`tools/compare_cutlang_outputs.py A.root B.root` compares two CutLang outputs
 histogram by histogram, and cutflows bin by bin by label.
 
 - The single-ADL workflow with post-run normalisation was checked against the
@@ -172,11 +184,43 @@ histogram by histogram, and cutflows bin by bin by label.
 - Splitting a sample into several CutLang processes (`--cutlang-parallel`) gives
   identical outputs to a single process.
 
+## Open Data framework outputs for validation
+
+The Open Data framework outputs compared with CutLang are produced with a fork of tag
+`10fb-legacy` (`688d73f`): release `10fb-legacy-validation-v1` (commit `2c039ff`) of
+[ahmetcansansar/atlas-outreach-cpp-framework-13tev](https://github.com/ahmetcansansar/atlas-outreach-cpp-framework-13tev)
+
+```bash
+git clone https://github.com/ahmetcansansar/atlas-outreach-cpp-framework-13tev.git
+cd atlas-outreach-cpp-framework-13tev && git checkout 10fb-legacy-validation-v1
+```
+
+The selections and physics histograms are unchanged (bin-identical to `10fb-legacy`).
+Each analysis additionally writes:
+
+- `hist_cutflow_unw` and `hist_cutflow_w` (TH1D) in every `Output_<A>/<sample>.root`:
+  bin k counts the events after selection stage k, unweighted and with the framework's
+  per-event weight (scale factors × MC weight, before the xsec·L/(sumw·eff) normalisation);
+- `Output_<A>/<sample>.csv`: one row per event passing the final selection, with
+  runNumber, eventNumber and the main analysis variables. The SUSY analysis writes one
+  file per signal region, in `Output_SUSYAnalysis/SR_loose/` and `SR_tight/`.
+
+To produce the outputs, follow the framework's own README (`welcome.sh`, the input path in
+`main_<A>.C`, then `run.sh`). Answer 0 (no PROOF) to the PROOF question when the event
+dumps are needed: PROOF-Lite workers would all write to the same CSV file.
+
+`tools/compare_event_dumps.py --files <cutlang.csv> <framework.csv>` compares the events
+selected by CutLang and by the framework, matched on (runNumber, eventNumber), and lists
+every event selected by only one of them (`--out <prefix>` also writes them to CSV files).
+Each file holds one sample, or a merged group made by concatenating the per-sample files
+(e.g. `cat data_A.csv data_B.csv data_C.csv data_D.csv > data.csv`).
+
 ## Performance benchmark
 
-`benchmark/bench_Zee.C` replaces `run.sh` and `main_ZBosonAnalysis.C` of the Open Data
+`tools/bench_Zee.C` replaces `run.sh` and `main_ZBosonAnalysis.C` of the Open Data
 framework's Z boson analysis and processes only the Z → ee sample. Copy it into
-`Analysis/ZBosonAnalysis/` of the framework at tag `10fb-legacy` and run it from there:
+`Analysis/ZBosonAnalysis/` of the framework at tag `10fb-legacy` (not the validation fork,
+which adds cutflow filling and CSV writing) and run it from there:
 
 ```bash
 root -l -b -q 'bench_Zee.C("<path>/mc_361106.Zee.2lep.root", N)'
@@ -214,10 +258,11 @@ analyses/<A>/<A>.adl        one ADL per analysis, used for every sample
 config/samples/<A>.yaml     input files, cross-sections, sums of weights, merge groups
 scripts/run_analysis.py     run CutLang over the samples of an analysis
 scripts/normalize_merge.py  normalise MC by 1/(sumw*eff) and merge into groups
-scripts/compare_outputs.py  bin-by-bin comparison of two CutLang output files
+tools/compare_cutlang_outputs.py  bin-by-bin comparison of two CutLang output files
+tools/compare_event_dumps.py  event-by-event comparison with the Open Data framework dumps
 scripts/plot_all.py         plotting the merged outputs
 docs/                       samples.md, download.md (+ download/<A>.txt URL lists, <A>.sha256 checksums)
-benchmark/bench_Zee.C       Running the Open Data framework for performance benchmark (Z boson analysis, Z→ee only)
+tools/bench_Zee.C           Running the Open Data framework for performance benchmark (Z boson analysis, Z→ee only)
 ```
 
 ## Citing

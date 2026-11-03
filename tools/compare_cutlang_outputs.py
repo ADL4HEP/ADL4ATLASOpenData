@@ -5,7 +5,7 @@ Histograms are compared bin by bin (including under/overflow) with a relative
 tolerance. Cutflows are matched by bin label, so a cut present in only one file
 (for instance an extra `weight` line) is reported but does not shift the rest.
 
-Usage: compare_outputs.py A.root B.root [--rtol 1e-6] [--atol 1e-9]
+Usage: compare_cutlang_outputs.py A.root B.root [--rtol 1e-6] [--atol 1e-9]
 Exit code 1 if any common histogram differs.
 """
 import argparse
