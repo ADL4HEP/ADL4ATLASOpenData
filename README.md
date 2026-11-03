@@ -240,7 +240,7 @@ Each analysis additionally writes:
 
 To produce the outputs, follow the framework's own README (`welcome.sh`, the input path in
 `main_<A>.C`, then `run.sh`). Answer 0 (no PROOF) to the PROOF question when the event
-dumps are needed: PROOF-Lite workers would all write to the same CSV file.
+dumps are needed: PROOF-Lite workers prevent the .csv files from being generated..
 
 `tools/compare_event_dumps.py --files <cutlang.csv> <framework.csv>` compares the events
 selected by CutLang and by the framework, matched on (runNumber, eventNumber), and lists

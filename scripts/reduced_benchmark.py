@@ -45,7 +45,7 @@ SKIM_OF = {
 
 
 def run_cutlang(analysis, target_dir, log, cutlang):
-    """Run one ADL on its skim; return (ok, message). Output: <target_dir>/<skim>."""
+    """Run one ADL on its skim; return (ok, message). Output: <target_dir>/histoOut-<skim>."""
     skim = SKIM_OF[analysis]
     adl = REPO / "analyses" / analysis / f"{analysis}.adl"
     target_dir.mkdir(parents=True, exist_ok=True)
@@ -57,7 +57,7 @@ def run_cutlang(analysis, target_dir, log, cutlang):
         produced = Path(work) / f"histoOut-{analysis}.root"
         if rc != 0 or not produced.exists():
             return False, f"CutLang failed (rc={rc}), see {log}"
-        shutil.move(str(produced), target_dir / skim)
+        shutil.move(str(produced), target_dir / f"histoOut-{skim}")
     return True, ""
 
 
