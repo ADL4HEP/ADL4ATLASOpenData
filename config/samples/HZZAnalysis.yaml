@@ -270,3 +270,19 @@ groups:
   - ZH125_ZZ4lep
   - WH125_ZZ4lep
   - VBFH125_ZZ4lep
+
+# Synchronisation of the cutflows with the ATLAS Open Data framework (tools/compare_cutflows.py).
+# One entry per framework cutflow stage k (bin k+1 of hist_cutflow_unw / hist_cutflow_w,
+# release 10fb-legacy-validation-v1): "cutlang" is the CutLang cutflow label after which the
+# same set of cuts has been applied, or null where no CutLang bin applies the same cuts
+# (different order, or a cut split or combined differently). ALL = all events.
+opendata_cutflow:
+  note: "the framework reads the samples whose 4lep ntuple is empty (W, Z->tautau, ...) from the 2lep ntuples; ALL and trigger differ for these samples, from Size(goodLepts) == 4 on they agree"
+  region: HZZAnalysis
+  stages:
+  - {stage: 0, opendata: "all events", cutlang: "ALL"}
+  - {stage: 1, opendata: "trigger", cutlang: "trigE == 1 OR trigM == 1"}
+  - {stage: 2, opendata: "exactly four good leptons", cutlang: "Size(goodLepts) == 4"}
+  - {stage: 3, opendata: "lepton pT thresholds 25/15/10 GeV", cutlang: "Pt(goodLepts[2]) > 10"}
+  - {stage: 4, opendata: "total charge zero", cutlang: null}
+  - {stage: 5, opendata: "valid eeee/mumumumu/eemumu flavour combination", cutlang: "pdgID(Z1) == 0 AND pdgID(Z2) == 0"}

@@ -14,9 +14,9 @@ results of the accompanying article:
 The analyses reproduce the educational analyses of the
 [ATLAS Open Data 13 TeV C++ framework](https://github.com/atlas-outreach-data-tools/atlas-outreach-cpp-framework-13tev)
 at tag **`10fb-legacy`** (commit `688d73f`). That tag corresponds to the 2020
-10 fb⁻¹ release; the main branch of the framework repository now targets newer
+10 fb⁻¹ release; the main branch of the Open Data framework repository now targets newer
 ATLAS Open Data releases and is **not** the reference for this suite.
-The framework outputs used for the validation come from a fork of that tag,
+The Open Data framework outputs used for the validation come from a fork of that tag,
 `10fb-legacy-validation-v1`, which only adds cutflows and event dumps (see
 [Open Data framework outputs for validation](#open-data-framework-outputs-for-validation)).
 
@@ -100,7 +100,7 @@ files, no network, under a minute) and compares every histogram and cutflow with
 reference outputs in `tests/reference/`:
 
 ```bash
-python3 scripts/reduced_benchmark.py --jobs 4
+python3 scripts/reduced_benchmark.py 
 ```
 
 ```
@@ -143,7 +143,7 @@ python3 scripts/run_analysis.py WZDiBosonAnalysis --outdir run/WZ/samples \
 | `--outdir DIR` | where per-sample outputs (`histoOut-<file>.root`) and logs (`logs/<sample>.log`) go |
 | `--samples a,b,...` | sample keys from `config/samples/<analysis>.yaml` (default: all) |
 | `--jobs N` | number of samples processed at the same time |
-| `--cutlang-parallel M` | split each sample into M CutLang processes over event ranges (`CLA.sh -j M`; multi-process, merged with `hadd`). `--jobs N` with `--cutlang-parallel M` starts N×M processes |
+| `--cutlang-parallel M` | Should not be used together with --jobs. split each sample into M CutLang processes over event ranges (`CLA.sh -j M`; multi-process, merged with `hadd`). `--jobs N` with `--cutlang-parallel M` starts N×M processes |
 | `--events N` | process only the first N events of each sample (for tests) |
 | `--input-dir DIR` | read ntuples from a local copy with the same directory layout instead of streaming |
 | `--cutlang DIR` | CutLang checkout (default: `$CUTLANG_DIR`) |
@@ -158,6 +158,7 @@ python3 scripts/run_analysis.py WZDiBosonAnalysis --outdir run/WZ/samples \
 | `--outdir DIR` | where the merged `<group>.root` files go |
 | `--per-sample` | also write each normalised sample to `<outdir>/samples/<sample>.root` |
 | `--allow-missing` | merge groups from the samples that are present |
+| `--opendata` | inputs are Open Data framework outputs (`Output_<analysis>/<sample>.root`), see below |
 
 ### `plot_all.py` options
 
@@ -184,12 +185,12 @@ the ADL statement).
 - **Data:** weight = 1.
 - **Simulation:** each event is weighted by `XSection × Lumi × scale factors × mcWeight`
   in the ADL (`Lumi` = 10064 pb⁻¹). After the run, each sample is scaled by
-  `1/(sumw × eff)`, using the sums of weights and efficiencies of the reference
-  framework (`Plotting/inputfiles/Files_*.txt` at tag `10fb-legacy`). These values
+  `1/(sumw × eff)`, using the sums of weights and efficiencies of the
+  Open Data framework (`Plotting/inputfiles/Files_*.txt` at tag `10fb-legacy`). These values
   are recorded per sample in `config/samples/<analysis>.yaml`. This is the
-  same normalisation the reference framework applies.
+  same normalisation the Open Data framework applies.
 - **Single-top samples** (DSID 410011–410026) use the sign of `mcWeight`, not the actual value and their sum
-  of weights is the number of generated events, as in the reference framework.
+  of weights is the number of generated events, as in the Open Data framework.
 - **Data vs simulation** is decided in the ADL by `channelNumber`, which holds
   the run number for data (< 310000). The Z′ signal (DSID 301325) is excluded
   from this test explicitly.
@@ -214,7 +215,6 @@ The exit code is non-zero if anything differs.
   per-sample-ADL workflow used for the article: data, simulated and single-top
   samples of the Z′ and Z boson analyses, and the Z′ signal. All histograms and
   cutflow bins agree within a relative difference of 10⁻⁶.
-- Splitting a sample into several CutLang processes (`--cutlang-parallel`) gives
   identical outputs to a single process.
 
 ## Open Data framework outputs for validation
@@ -231,28 +231,51 @@ cd atlas-outreach-cpp-framework-13tev && git checkout 10fb-legacy-validation-v1
 The selections and physics histograms are unchanged (bin-identical to `10fb-legacy`).
 Each analysis additionally writes:
 
-- `hist_cutflow_unw` and `hist_cutflow_w` (TH1D) in every `Output_<A>/<sample>.root`:
-  bin k counts the events after selection stage k, unweighted and with the framework's
+- `hist_cutflow_unw` and `hist_cutflow_w` (TH1D) in every `Output_<analysis>/<sample>.root`:
+  bin k counts the events after selection stage k, unweighted and with the Open Data framework's
   per-event weight (scale factors × MC weight, before the xsec·L/(sumw·eff) normalisation);
-- `Output_<A>/<sample>.csv`: one row per event passing the final selection, with
+- `Output_<analysis>/<sample>.csv`: one row per event passing the final selection, with
   runNumber, eventNumber and the main analysis variables. The SUSY analysis writes one
   file per signal region, in `Output_SUSYAnalysis/SR_loose/` and `SR_tight/`.
 
-To produce the outputs, follow the framework's own README (`welcome.sh`, the input path in
-`main_<A>.C`, then `run.sh`). Answer 0 (no PROOF) to the PROOF question when the event
-dumps are needed: PROOF-Lite workers prevent the .csv files from being generated..
+To produce the outputs, follow the Open Data framework's own README (`welcome.sh`, the input path in
+`main_<analysis>.C`, then `run.sh`). Answer 0 (no PROOF) to the PROOF question when the event
+dumps are needed: PROOF-Lite workers prevent the .csv files from being generated.
 
-`tools/compare_event_dumps.py --files <cutlang.csv> <framework.csv>` compares the events
-selected by CutLang and by the framework, matched on (runNumber, eventNumber), and lists
+The Open Data framework outputs are normalised and merged into the same groups as the CutLang outputs
+with
+
+```bash
+python3 scripts/normalize_merge.py ZBosonAnalysis --opendata \
+    --indir Output_ZBosonAnalysis --outdir run/Zboson/opendata
+```
+
+Each MC sample is scaled by Lumi·xsec/(sumw·eff) with Lumi = 10064 pb⁻¹, as in the Open Data framework's
+`Plotting/Plotting.cxx`; `hist_cutflow_unw` is not scaled. The hand-set normalisation factors
+of `Plotting.cxx` (e.g. ZZ × 1.3 in HZZ) and its overflow handling are not applied. Data may be
+one `data.root` or one file per period (`dataA.root` … `dataD.root`).
+
+The cutflows are compared at their synchronisation points with
+
+```bash
+python3 tools/compare_cutflows.py ZBosonAnalysis --opendata run/Zboson/opendata \
+    --cutlang run/Zboson/merged --cutlang-unweighted run/Zboson/merged_unweighted
+```
+
+The reference unweighted cutflows from CutLang have been provided in `reference_results/<analysis>/CutLang_unweighted`. In order to reproduce
+the unweighted results, the benchmark ADL files can be run with the `weight` lines commented out in the respective regions.
+
+`tools/compare_event_dumps.py --files <cutlang.csv> <opendata.csv>` compares the events
+selected by CutLang and by the Open Data framework, matched on (runNumber, eventNumber), and lists
 every event selected by only one of them (`--out <prefix>` also writes them to CSV files).
 Each file holds one sample, or a merged group made by concatenating the per-sample files
 (e.g. `cat data_A.csv data_B.csv data_C.csv data_D.csv > data.csv`).
 
 ## Performance benchmark
 
-`tools/bench_Zee.C` replaces `run.sh` and `main_ZBosonAnalysis.C` of the Open Data
-framework's Z boson analysis and processes only the Z → ee sample. Copy it into
-`Analysis/ZBosonAnalysis/` of the framework at tag `10fb-legacy` (not the validation fork,
+`tools/bench_Zee.C` replaces `run.sh` and `main_ZBosonAnalysis.C` of the
+Open Data framework's Z boson analysis and processes only the Z → ee sample. Copy it into
+`Analysis/ZBosonAnalysis/` of the Open Data framework at tag `10fb-legacy` (not the validation fork,
 which adds cutflow filling and CSV writing) and run it from there:
 
 ```bash
@@ -287,19 +310,20 @@ groups:                                            # merged output files <group>
 ## Repository layout
 
 ```
-analyses/<A>/<A>.adl        one ADL per analysis, used for every sample
-config/samples/<A>.yaml     input files, cross-sections, sums of weights, merge groups
-scripts/run_analysis.py     run CutLang over the samples of an analysis
-scripts/normalize_merge.py  normalise MC by 1/(sumw*eff) and merge into groups
-tools/compare_cutlang_outputs.py  bin-by-bin comparison of CutLang outputs (two files, or a run against reference_results/)
-tools/compare_event_dumps.py  event-by-event comparison with the Open Data framework dumps
-scripts/plot_all.py         plotting the merged outputs
-scripts/reduced_benchmark.py  reduced benchmark: all analyses on the test skims, compared with tests/reference/
-tests/skims/                5000-event test skims (+ skims.sha256)
-tests/reference/<A>/        reference outputs of the reduced benchmark
-reference_results/<A>/      reference outputs of the full benchmark (CutLang/, ODFramework/)
-docs/                       samples.md, download.md (+ download/<A>.txt URL lists, <A>.sha256 checksums)
-tools/bench_Zee.C           Running the Open Data framework for performance benchmark (Z boson analysis, Z→ee only)
+analyses/<analysis>/<analysis>.adl  one ADL per analysis, used for every sample
+config/samples/<analysis>.yaml      input files, cross-sections, sums of weights, merge groups
+scripts/run_analysis.py             run CutLang over the samples of an analysis
+scripts/normalize_merge.py          normalise MC by 1/(sumw*eff) and merge into groups (--opendata: Open Data framework outputs)
+tools/compare_cutlang_outputs.py    bin-by-bin comparison of CutLang outputs (two files, or a run against reference_results/)
+tools/compare_event_dumps.py        event-by-event comparison with the Open Data framework dumps
+tools/compare_cutflows.py           cutflow comparison with the Open Data framework at the stages mapped in config/samples/<analysis>.yaml
+scripts/plot_all.py                 plotting the merged outputs
+scripts/reduced_benchmark.py        reduced benchmark: all analyses on the test skims, compared with tests/reference/
+tests/skims/                        5000-event test skims (+ skims.sha256)
+tests/reference/<analysis>/         reference outputs of the reduced benchmark
+reference_results/<analysis>/       reference outputs of the full benchmark (CutLang/, ODFramework/)
+docs/                               samples.md, download.md (+ download/<analysis>.txt URL lists, <analysis>.sha256 checksums)
+tools/bench_Zee.C                   Running the Open Data framework for performance benchmark (Z boson analysis, Z→ee only)
 ```
 
 ## Citing
@@ -308,6 +332,3 @@ If you use this suite, please cite the article [TBD: reference] and the
 release used ([TBD: Zenodo DOI]). The ADL files build on the
 [ADL4LHCOpenData](https://github.com/ahmetcansansar/ADL4LHCOpenData) collection.
 
-## Licence
-
-[TBD]

@@ -240,3 +240,20 @@ groups:
   - lllv
   - llvv
   - lvvv
+
+# Synchronisation of the cutflows with the ATLAS Open Data framework (tools/compare_cutflows.py).
+# One entry per framework cutflow stage k (bin k+1 of hist_cutflow_unw / hist_cutflow_w,
+# release 10fb-legacy-validation-v1): "cutlang" is the CutLang cutflow label after which the
+# same set of cuts has been applied, or null where no CutLang bin applies the same cuts
+# (different order, or a cut split or combined differently). ALL = all events.
+opendata_cutflow:
+  note: "the framework event weight has no scaleFactor_BTAG (the ADL weight has); weighted MC agrees only after Size(JET) == 0, where it is 1"
+  region: ZBosonAnalysis_ll
+  stages:
+  - {stage: 0, opendata: "all events", cutlang: "ALL"}
+  - {stage: 1, opendata: "trigger", cutlang: "trigE == 1 OR trigM == 1"}
+  - {stage: 2, opendata: "exactly two good leptons", cutlang: "Size(goodLepts) == 2"}
+  - {stage: 3, opendata: "opposite charge", cutlang: "q(Lepton1)*q(Lepton2) < 0"}
+  - {stage: 4, opendata: "same flavour", cutlang: "Abs(pdgID(Lepton1)) == Abs(pdgID(Lepton2))"}
+  - {stage: 5, opendata: "|mll - mZ| < 25 GeV", cutlang: "zMassWindow < 25"}
+  - {stage: 6, opendata: "no jets", cutlang: "Size(JET) == 0"}

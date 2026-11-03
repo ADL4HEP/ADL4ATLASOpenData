@@ -239,3 +239,17 @@ groups:
   - single_antitop_wtchan
   - single_top_schan
   - single_antitop_schan
+
+# Synchronisation of the cutflows with the ATLAS Open Data framework (tools/compare_cutflows.py).
+# One entry per framework cutflow stage k (bin k+1 of hist_cutflow_unw / hist_cutflow_w,
+# release 10fb-legacy-validation-v1): "cutlang" is the CutLang cutflow label after which the
+# same set of cuts has been applied, or null where no CutLang bin applies the same cuts
+# (different order, or a cut split or combined differently). ALL = all events.
+opendata_cutflow:
+  region: WZDiBosonAnalysis
+  stages:
+  - {stage: 0, opendata: "all events", cutlang: "ALL"}
+  - {stage: 1, opendata: "trigger", cutlang: "trigE == 1 OR trigM == 1"}
+  - {stage: 2, opendata: "exactly three good leptons", cutlang: "Size(goodLepts) == 3"}
+  - {stage: 3, opendata: "|m_ll - mZ| < 10 GeV (Z candidate)", cutlang: null}
+  - {stage: 4, opendata: "mtw > 30 GeV, MET > 30 GeV, at least one lepton with pT > 25 GeV", cutlang: "Pt(goodLepts) > 25.0"}

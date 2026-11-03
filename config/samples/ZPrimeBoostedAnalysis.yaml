@@ -520,3 +520,22 @@ groups:
   - ttbar_lep
   signal:
   - ZPrime1000_tt
+
+# Synchronisation of the cutflows with the ATLAS Open Data framework (tools/compare_cutflows.py).
+# One entry per framework cutflow stage k (bin k+1 of hist_cutflow_unw / hist_cutflow_w,
+# release 10fb-legacy-validation-v1): "cutlang" is the CutLang cutflow label after which the
+# same set of cuts has been applied, or null where no CutLang bin applies the same cuts
+# (different order, or a cut split or combined differently). ALL = all events.
+opendata_cutflow:
+  region: Zprime
+  stages:
+  - {stage: 0, opendata: "all events", cutlang: "ALL"}
+  - {stage: 1, opendata: "at least 1 large-R jet", cutlang: "Size(FJET) >= 1"}
+  - {stage: 2, opendata: "MET > 20 GeV", cutlang: "MET > 20"}
+  - {stage: 3, opendata: "electron or muon trigger", cutlang: "trigE == 1 OR trigM == 1"}
+  - {stage: 4, opendata: "exactly one good lepton", cutlang: "Size(goodLepts) == 1"}
+  - {stage: 5, opendata: "MET + mTW > 60 GeV", cutlang: "(MET + MTW) > 60"}
+  - {stage: 6, opendata: "at least 1 b-tagged jet", cutlang: "Size(goodBJets) >= 1"}
+  - {stage: 7, opendata: "at least 1 small-R jet with dR(lep,jet) < 2.0", cutlang: "Size(goodDRJets) >= 1"}
+  - {stage: 8, opendata: "exactly 1 top-tagged large-R jet", cutlang: "Size(topLRJets) == 1"}
+  - {stage: 9, opendata: "selected small-R jet is b-tagged", cutlang: "jet_MV2c10(goodDRJets[0]) > 0.8244273"}

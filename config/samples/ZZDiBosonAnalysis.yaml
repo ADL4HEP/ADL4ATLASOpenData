@@ -238,3 +238,19 @@ groups:
   - Zee
   - Zmumu
   - Ztautau
+
+# Synchronisation of the cutflows with the ATLAS Open Data framework (tools/compare_cutflows.py).
+# One entry per framework cutflow stage k (bin k+1 of hist_cutflow_unw / hist_cutflow_w,
+# release 10fb-legacy-validation-v1): "cutlang" is the CutLang cutflow label after which the
+# same set of cuts has been applied, or null where no CutLang bin applies the same cuts
+# (different order, or a cut split or combined differently). ALL = all events.
+opendata_cutflow:
+  region: ZZDibosonAnalysis
+  stages:
+  - {stage: 0, opendata: "all events", cutlang: "ALL"}
+  - {stage: 1, opendata: "at least four leptons", cutlang: null}
+  - {stage: 2, opendata: "trigger", cutlang: null}
+  - {stage: 3, opendata: "exactly four good leptons", cutlang: "Size(goodLepts) == 4"}
+  - {stage: 4, opendata: "total charge zero", cutlang: null}
+  - {stage: 5, opendata: "at least one lepton with pT > 25 GeV", cutlang: null}
+  - {stage: 6, opendata: "valid eeee/mumumumu/eemumu and sum of |m_ll - mZ| < 50 GeV", cutlang: "ZZsum < 50"}

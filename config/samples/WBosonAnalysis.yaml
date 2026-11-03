@@ -528,3 +528,17 @@ groups:
   - Wtaunu_PTV280_500_BFilter
   - Wtaunu_PTV500_1000
   - Wtaunu_PTV1000
+
+# Synchronisation of the cutflows with the ATLAS Open Data framework (tools/compare_cutflows.py).
+# One entry per framework cutflow stage k (bin k+1 of hist_cutflow_unw / hist_cutflow_w,
+# release 10fb-legacy-validation-v1): "cutlang" is the CutLang cutflow label after which the
+# same set of cuts has been applied, or null where no CutLang bin applies the same cuts
+# (different order, or a cut split or combined differently). ALL = all events.
+opendata_cutflow:
+  region: WBosonAnalysis_lnu
+  stages:
+  - {stage: 0, opendata: "all events", cutlang: "ALL"}
+  - {stage: 1, opendata: "MET > 30 GeV", cutlang: "MET > 30.0"}
+  - {stage: 2, opendata: "trigger", cutlang: "trigE == 1 OR trigM == 1"}
+  - {stage: 3, opendata: "exactly one good lepton", cutlang: "Size(goodLepts) == 1"}
+  - {stage: 4, opendata: "mtw > 60 GeV", cutlang: "MTW > 60.0"}

@@ -849,3 +849,24 @@ groups:
   - Ztautau_PTV280_500_BFilter
   - Ztautau_PTV500_1000
   - Ztautau_PTV1000
+
+# Synchronisation of the cutflows with the ATLAS Open Data framework (tools/compare_cutflows.py).
+# One entry per framework cutflow stage k (bin k+1 of hist_cutflow_unw / hist_cutflow_w,
+# release 10fb-legacy-validation-v1): "cutlang" is the CutLang cutflow label after which the
+# same set of cuts has been applied, or null where no CutLang bin applies the same cuts
+# (different order, or a cut split or combined differently). ALL = all events.
+opendata_cutflow:
+  region: SR2loose
+  stages:
+  - {stage: 0, opendata: "all events", cutlang: "ALL"}
+  - {stage: 1, opendata: "at least 2 leptons", cutlang: null}
+  - {stage: 2, opendata: "exactly 2 good leptons", cutlang: "Size(signalLepts) == 2"}
+  - {stage: 3, opendata: "same flavour", cutlang: null}
+  - {stage: 4, opendata: "opposite charge", cutlang: "pdgID(leadLept) + pdgID(subleadLept) == 0"}
+  - {stage: 5, opendata: "leading lepton pT >= 25 GeV", cutlang: "Pt(leadLept) >= 25"}
+  - {stage: 6, opendata: "subleading lepton pT >= 20 GeV", cutlang: "Pt(subleadLept) >= 20"}
+  - {stage: 7, opendata: "flavour-dependent |eta| and trigger", cutlang: "(Abs(pdgID(leadLept)) == 11 AND trigE == 1) OR (Abs(pdgID(leadLept)) == 13 AND trigM == 1)"}
+  - {stage: 8, opendata: "mLL >= 40 GeV (end of pre-selection)", cutlang: "mLL >= 40"}
+  - {stage: 9, opendata: "jet veto", cutlang: "Size(JetsD) == 0"}
+  - {stage: 10, opendata: "SR_loose: mLL > 111 GeV and MT2 > 100 GeV", cutlang: "mLL > 111", region: SR2loose}
+  - {stage: 11, opendata: "SR_tight: mLL > 300 GeV and MT2 > 130 GeV", cutlang: "mLL > 300", region: SR2tight}
