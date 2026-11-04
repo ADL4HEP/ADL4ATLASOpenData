@@ -52,6 +52,7 @@ commands and SHA-256 checksums to check the downloaded files. The complete list 
 | ROOT | 6.30.02 | with PyROOT and XRootD (for streaming the samples) |
 | Python | 3.9 or newer | packages: `pyyaml`, `numpy`, `uproot` |
 | OS | Linux or macOS | tested on Linux RHEL9 and macOS 26 (arm64) |
+| Container image | `ghcr.io/ahmetcansansar/adl4atlasopendata-env@sha256:0147e826…` | ROOT 6.30.02, GCC 11.5.0, AlmaLinux 9, Python 3.9 (see [Running in the container](#running-in-the-container)) |
 
 Streaming the samples needs ROOT built with XRootD (`root-config --has-xrootd` should
 print `yes`). The configs stream from
@@ -77,6 +78,47 @@ cd ADL4ATLASOpenData
 python3 -m pip install pyyaml numpy uproot
 python3 -c "import ROOT"              # check that PyROOT is available
 ```
+
+### Running in the container
+
+Instead of installing the software, the locked environment can be used: a Docker image with
+ROOT 6.30.02 (AlmaLinux 9), CutLang v2.16.0, the Open Data framework release
+`10fb-legacy-validation-v1` and the Python packages of the suite (`docker/Dockerfile`).
+The image holds the software only; the repository is mounted into it.
+
+```bash
+git clone https://github.com/ahmetcansansar/ADL4ATLASOpenData.git
+cd ADL4ATLASOpenData
+
+# get the image (once), identified by its digest, and give it a short local name
+docker pull --platform linux/amd64 ghcr.io/ahmetcansansar/adl4atlasopendata-env@sha256:0147e826c0cdd3024c6f543b63895b784e1dd6d43a6db349f80c44ee8d614ccf
+docker tag  ghcr.io/ahmetcansansar/adl4atlasopendata-env@sha256:0147e826c0cdd3024c6f543b63895b784e1dd6d43a6db349f80c44ee8d614ccf adl4atlasopendata-env
+
+# open a shell in the container, with the repository mounted at /work
+docker run --rm -it --platform linux/amd64 --user "$(id -u):$(id -g)" -v "$PWD":/work adl4atlasopendata-env bash
+```
+
+The shell starts in `/work`, the repository, with ROOT, CutLang (`$CUTLANG_DIR`), the Open
+Data framework (`$OPENDATA_FRAMEWORK_DIR`) and the Python packages set up; every command of
+this README runs there as shown, and the outputs are written to the repository. A first check
+is the [reduced benchmark](#reduced-benchmark-one-command):
+
+```bash
+python3 scripts/reduced_benchmark.py
+```
+
+`exit` leaves the container. A single command can also be run without a shell, e.g.
+`docker run --rm --platform linux/amd64 --user "$(id -u):$(id -g)" -v "$PWD":/work adl4atlasopendata-env python3 scripts/reduced_benchmark.py`;
+without a command, the container runs the reduced benchmark.
+
+On systems with Apptainer instead of Docker (e.g. lxplus), the same image opens a shell with
+`apptainer shell --cleanenv --bind "$PWD":/work --pwd /work docker://ghcr.io/ahmetcansansar/adl4atlasopendata-env@sha256:0147e826c0cdd3024c6f543b63895b784e1dd6d43a6db349f80c44ee8d614ccf`.
+
+The image is built for `linux/amd64`; on Apple-silicon Macs, Docker runs it under emulation.
+Under this emulation the MT2 values of the SUSY analysis differ from those on x86-64, so its
+outputs do not match the reference; the other eight analyses do. 
+Image page: <https://ghcr.io/ahmetcansansar/adl4atlasopendata-env>.
+To build the image yourself: `docker buildx build --platform linux/amd64 -t adl4atlasopendata-env docker/`.
 
 ## Quick start (a few minutes)
 
@@ -322,13 +364,9 @@ scripts/reduced_benchmark.py        reduced benchmark: all analyses on the test 
 tests/skims/                        5000-event test skims (+ skims.sha256)
 tests/reference/<analysis>/         reference outputs of the reduced benchmark
 reference_results/<analysis>/       reference outputs of the full benchmark (CutLang/, ODFramework/)
+docker/Dockerfile                   software environment: ROOT 6.30.02, CutLang v2.16.0, Open Data framework fork (+ requirements.txt)
 docs/                               samples.md, download.md (+ download/<analysis>.txt URL lists, <analysis>.sha256 checksums)
 tools/bench_Zee.C                   Running the Open Data framework for performance benchmark (Z boson analysis, Z→ee only)
 ```
 
-## Citing
-
-If you use this suite, please cite the article [TBD: reference] and the
-release used ([TBD: Zenodo DOI]). The ADL files build on the
-[ADL4LHCOpenData](https://github.com/ahmetcansansar/ADL4LHCOpenData) collection.
 
