@@ -1,10 +1,9 @@
-# ATLAS Open Data ADL Benchmark Suite
+# ATLAS Open Data ADL Analysis Suite
 
 **ADL4ATLASOpenData** contains nine physics analyses of the ATLAS Open Data
 13 TeV release (2020, 10 fb⁻¹), written in the Analysis Description Language
 (ADL), together with what is needed to run them with the
-[CutLang](https://github.com/unelg/CutLang) interpreter and reproduce the
-results of the accompanying article:
+[CutLang](https://github.com/unelg/CutLang) interpreter:
 
 - one ADL file per analysis, used for all data and simulated samples;
 - per-analysis sample configurations: input files, cross-sections, sums of weights, merge groups;
@@ -99,7 +98,7 @@ docker run --rm -it --platform linux/amd64 --user "$(id -u):$(id -g)" -v "$PWD":
 The shell starts in `/work`, the repository, with ROOT, CutLang (`$CUTLANG_DIR`), the Open
 Data framework (`$OPENDATA_FRAMEWORK_DIR`) and the Python packages set up; every command of
 this README runs there as shown, and the outputs are written to the repository. A first check
-is the [reduced benchmark](#reduced-benchmark-one-command):
+is the [reduced analysis benchmark](#reduced-analysis-benchmark):
 
 ```bash
 python3 scripts/reduced_benchmark.py
@@ -107,7 +106,7 @@ python3 scripts/reduced_benchmark.py
 
 `exit` leaves the container. A single command can also be run without a shell, e.g.
 `docker run --rm --platform linux/amd64 --user "$(id -u):$(id -g)" -v "$PWD":/work adl4atlasopendata-env python3 scripts/reduced_benchmark.py`;
-without a command, the container runs the reduced benchmark.
+without a command, the container runs the reduced analysis benchmark.
 
 On systems with Apptainer instead of Docker (e.g. lxplus), the same image opens a shell with
 `apptainer shell --cleanenv --bind "$PWD":/work --pwd /work docker://ghcr.io/ahmetcansansar/adl4atlasopendata-env@sha256:0147e826c0cdd3024c6f543b63895b784e1dd6d43a6db349f80c44ee8d614ccf`.
@@ -133,7 +132,7 @@ python3 scripts/normalize_merge.py ZBosonAnalysis \
 
 `--allow-missing` lets the merge proceed with only part of the samples.
 
-## Reduced benchmark (one command)
+## Reduced analysis benchmark
 
 Runs all nine analyses with CutLang on the 5000-event test skims in `tests/skims/` (local
 files, no network, under a minute) and compares every histogram and cutflow with the
@@ -358,9 +357,9 @@ tools/compare_cutlang_outputs.py    bin-by-bin comparison of CutLang outputs (tw
 tools/compare_event_dumps.py        event-by-event comparison with the Open Data framework dumps
 tools/compare_cutflows.py           cutflow comparison with the Open Data framework at the stages mapped in config/samples/<analysis>.yaml
 scripts/plot_all.py                 plotting the merged outputs
-scripts/reduced_benchmark.py        reduced benchmark: all analyses on the test skims, compared with tests/reference/
+scripts/reduced_benchmark.py        reduced analysis benchmark: all analyses on the test skims, compared with tests/reference/
 tests/skims/                        5000-event test skims (+ skims.sha256)
-tests/reference/<analysis>/         reference outputs of the reduced benchmark
+tests/reference/<analysis>/         reference outputs of the reduced analysis benchmark
 reference_results/<analysis>/       reference outputs of the full benchmark (CutLang/, ODFramework/)
 docker/Dockerfile                   software environment: ROOT 6.30.02, CutLang v2.16.0, Open Data framework fork (+ requirements.txt)
 docs/                               samples.md, download.md (+ download/<analysis>.txt URL lists, <analysis>.sha256 checksums)

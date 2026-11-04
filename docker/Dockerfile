@@ -1,4 +1,4 @@
-# Software environment of the ATLAS Open Data ADL Benchmark Suite.
+# Software environment of the ATLAS Open Data ADL Analysis Suite.
 #
 # The image holds the software only: ROOT 6.30.02, CutLang v2.16.0 and the Open Data framework
 # fork (release 10fb-legacy-validation-v1), plus the Python packages of the suite scripts.

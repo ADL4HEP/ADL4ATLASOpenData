@@ -1,0 +1,94 @@
+{
+  "title": "ATLAS Open Data ADL Analysis Suite",
+  "upload_type": "software",
+  "version": "1.0.0",
+  "description": "<p>A software package for running and validating nine analyses of the ATLAS Open Data C++ framework, implemented in ADL and run with the CutLang runtime interpreter. It provides input dataset information, sample configurations, scripts to run the analyses, normalize and merge the outputs, plot the results and compare cutflows with the ATLAS Open Data framework.</p>",
+  "creators": [
+    {
+      "name": "Adıgüzel, Aytül",
+      "affiliation": "Istanbul University; Boğaziçi University, Feza Gürsey Center for Physics and Mathematics",
+      "orcid": "0000-0001-6644-0517"
+    },
+    {
+      "name": "Sansar, Ahmetcan",
+      "affiliation": "Istanbul University",
+      "orcid": "0009-0008-7504-7950"
+    },
+    {
+      "name": "Şahan, Kağan",
+      "affiliation": "Istanbul University"
+    },
+    {
+      "name": "Karaca, Kürşat",
+      "affiliation": "Istanbul University"
+    }
+  ],
+  "license": "mit",
+  "access_right": "open",
+  "keywords": [
+    "Analysis Description Language",
+    "ADL",
+    "CutLang",
+    "ATLAS Open Data",
+    "analysis preservation",
+    "reproducibility",
+    "high energy physics"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/unelg/CutLang/tree/v2.16.0",
+      "relation": "requires",
+      "resource_type": "software",
+      "scheme": "url"
+    },
+    {
+      "identifier": "10.1016/j.cpc.2018.06.023",
+      "relation": "references",
+      "resource_type": "publication-article",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "10.3389/fdata.2021.659986",
+      "relation": "references",
+      "resource_type": "publication-article",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "https://github.com/ahmetcansansar/atlas-outreach-cpp-framework-13tev/releases/tag/10fb-legacy-validation-v1",
+      "relation": "requires",
+      "resource_type": "software",
+      "scheme": "url"
+    },
+    {
+      "identifier": "10.7483/OPENDATA.ATLAS.NQ31.Y1OO",
+      "relation": "requires",
+      "resource_type": "dataset",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "10.7483/OPENDATA.ATLAS.GQ1W.I9VI",
+      "relation": "requires",
+      "resource_type": "dataset",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "10.7483/OPENDATA.ATLAS.DN95.JW6T",
+      "relation": "requires",
+      "resource_type": "dataset",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "10.7483/OPENDATA.ATLAS.2Y1T.TLGL",
+      "relation": "requires",
+      "resource_type": "dataset",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "10.7483/OPENDATA.ATLAS.FRWJ.4ZQU",
+      "relation": "requires",
+      "resource_type": "dataset",
+      "scheme": "doi"
+    }
+  ],
+  "notes": "Supported by the CHIST-ERA OpenMAPP project under grant 223N165 from The Scientific and Technological Research Council of Türkiye (TUBITAK)."
+}
