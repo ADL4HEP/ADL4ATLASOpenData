@@ -70,7 +70,7 @@ cd CLA && make -j4 && cd ../..        # requires ROOT (root-config in PATH), fle
 export CUTLANG_DIR=$PWD/CutLang
 
 # 2. This repository and its Python dependencies
-git clone https://github.com/ahmetcansansar/ADL4ATLASOpenData.git
+git clone https://github.com/ADL4HEP/ADL4ATLASOpenData.git
 cd ADL4ATLASOpenData
 python3 -m pip install pyyaml numpy uproot
 python3 -c "import ROOT"              # check that PyROOT is available
@@ -84,7 +84,7 @@ ROOT 6.30.02 (AlmaLinux 9), CutLang v2.16.0, the Open Data framework release
 The image holds the software only; the repository is mounted into it.
 
 ```bash
-git clone https://github.com/ahmetcansansar/ADL4ATLASOpenData.git
+git clone https://github.com/ADL4HEP/ADL4ATLASOpenData.git
 cd ADL4ATLASOpenData
 
 # get the image (once), identified by its digest, and give it a short local name
