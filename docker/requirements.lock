@@ -1,0 +1,13 @@
+# Exact Python packages of the image (pip freeze of the first build from requirements.txt).
+# The Dockerfile installs from this file; requirements.txt lists the direct dependencies.
+PyYAML==6.0.1
+awkward==2.8.12
+awkward-cpp==51
+cramjam==2.11.0
+fsspec==2025.10.0
+importlib-metadata==8.7.1
+numpy==1.26.4
+packaging==26.3
+typing-extensions==4.16.0
+uproot==5.3.10
+zipp==3.23.1

@@ -20,8 +20,6 @@ The Open Data framework outputs used for the validation come from a fork of that
 `10fb-legacy-validation-v1`, which only adds cutflows and event dumps (see
 [Open Data framework outputs for validation](#open-data-framework-outputs-for-validation)).
 
-> Status: pre-release. Planned for v1.0.0: container image, reference outputs
-> and automated comparison tests, plotting scripts for the article figures.
 
 ## Analyses
 
@@ -169,9 +167,8 @@ python3 scripts/plot_all.py TTbarAnalysis --indir run/TTbar/merged --outdir run/
 The analysis name is the directory name under `analyses/`. The run is
 resumable: samples whose output already exists are skipped, unless `--force`
 is given. While samples run, a status block shows events processed, rate and
-estimated time per sample. In a terminal the block is redrawn in place;
-when the output goes to a file it is appended every `--progress-interval`
-seconds. To run only the data, for example:
+estimated time per sample. Progress bar refresh interval can be modified with
+`--progress-interval` argument. To run only the data, for example:
 
 ```bash
 python3 scripts/run_analysis.py WZDiBosonAnalysis --outdir run/WZ/samples \
@@ -185,7 +182,7 @@ python3 scripts/run_analysis.py WZDiBosonAnalysis --outdir run/WZ/samples \
 | `--outdir DIR` | where per-sample outputs (`histoOut-<file>.root`) and logs (`logs/<sample>.log`) go |
 | `--samples a,b,...` | sample keys from `config/samples/<analysis>.yaml` (default: all) |
 | `--jobs N` | number of samples processed at the same time |
-| `--cutlang-parallel M` | Should not be used together with --jobs. split each sample into M CutLang processes over event ranges (`CLA.sh -j M`; multi-process, merged with `hadd`). `--jobs N` with `--cutlang-parallel M` starts N×M processes |
+| `--cutlang-parallel M` | Should not be used together with --jobs. split each sample into M CutLang processes over event ranges (`CLA.sh -j M`; multi-process, merged with `hadd`).|
 | `--events N` | process only the first N events of each sample (for tests) |
 | `--input-dir DIR` | read ntuples from a local copy with the same directory layout instead of streaming |
 | `--cutlang DIR` | CutLang checkout (default: `$CUTLANG_DIR`) |
@@ -294,10 +291,11 @@ python3 scripts/normalize_merge.py ZBosonAnalysis --opendata \
 
 Each MC sample is scaled by Lumi·xsec/(sumw·eff) with Lumi = 10064 pb⁻¹, as in the Open Data framework's
 `Plotting/Plotting.cxx`; `hist_cutflow_unw` is not scaled. The hand-set normalisation factors
-of `Plotting.cxx` (e.g. ZZ × 1.3 in HZZ) and its overflow handling are not applied. Data may be
+of `Plotting.cxx` (e.g. ZZ × 1.3 in HZZAnalysis) and its overflow handling are not applied. Data may be
 one `data.root` or one file per period (`dataA.root` … `dataD.root`).
 
-The cutflows are compared at their synchronisation points with
+The cutflows of CutLang and the Open Data framework are compared after the cuts that both apply
+in the same way, as listed in `config/samples/<analysis>.yaml`:
 
 ```bash
 python3 tools/compare_cutflows.py ZBosonAnalysis --opendata run/Zboson/opendata \

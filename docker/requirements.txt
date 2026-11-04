@@ -1,0 +1,4 @@
+# Python packages of the suite scripts (Python 3.9 of the ROOT 6.30.02 AlmaLinux 9 image)
+PyYAML==6.0.1
+numpy==1.26.4
+uproot==5.3.10
